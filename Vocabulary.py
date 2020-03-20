@@ -15,6 +15,7 @@ def read():
     my_list = []
     for line in file:
         y = line.replace("\t", " ")
+        y = y.replace("\n", "")
         x = y.split(" ", 3)
         message = vocabularies(0, x[3])
         my_list.append(Language(x[2], message))
