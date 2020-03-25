@@ -1,6 +1,7 @@
 import Vocabulary
 import gram
 from collections import Counter
+import math
 
 
 def countWords(dictionary):
@@ -27,6 +28,7 @@ glCount = 0
 for i in Vocabulary.read():
     # print(i.message)
     whichGram = 2
+    smooth_value = 0.1
     arr = gram.gram(i.message, whichGram)
     if i.language == 'en':
         enCount += 1
@@ -54,6 +56,24 @@ euList = (Counter(euList))
 caList = (Counter(caList))
 glList = (Counter(glList))
 
+for key, value in esList.items():
+    esList[key] = value+smooth_value
+
+for key, value in enList.items():
+    enList[key] = value+smooth_value
+
+for key, value in ptList.items():
+    ptList[key] = value+smooth_value
+
+for key, value in euList.items():
+    euList[key] = value+smooth_value
+
+for key, value in caList.items():
+    caList[key] = value+smooth_value
+
+for key, value in glList.items():
+    glList[key] = value+smooth_value
+
 enWords = countWords(enList)
 esWords = countWords(esList)
 ptWords = countWords(ptList)
@@ -74,42 +94,43 @@ test = 'iamcool'
 if whichGram == 1:
     enScore = enTweetProb
     for i in test:
-        enScore += int(enList.get(i, 0)) / enWords
+        enScore += math.log(((enList.get(i, smooth_value)) / enWords),10)
     print("======")
     print(enScore)
 
     esScore = esTweetProb
     for i in test:
-        esScore += int(esList.get(i, 0)) / esWords
+        esScore += math.log(((esList.get(i, smooth_value)) / esWords), 10)
     print("======")
     print(esScore)
 
     ptScore = ptTweetProb
     for i in test:
-        ptScore += int(ptList.get(i, 0)) / ptWords
+        ptScore += math.log(((ptList.get(i, smooth_value)) / ptWords), 10)
     print("======")
     print(ptScore)
 
     euScore = euTweetProb
     for i in test:
-        euScore += int(euList.get(i, 0)) / euWords
+        euScore += math.log(((euList.get(i, 0)) / euWords), 10)
     print("======")
     print(euScore)
 
     caScore = caTweetProb
     for i in test:
-        caScore += int(caList.get(i, 0)) / caWords
+        caScore += math.log(((caList.get(i, smooth_value)) / caWords), 10)
     print("======")
     print(caScore)
 
     glScore = glTweetProb
     for i in test:
-        glScore += int(glList.get(i, 0)) / glWords
+        glScore += math.log(((glList.get(i, smooth_value)) / glWords), 10)
     print("======")
     print(glScore)
 
 if whichGram == 2:
-    test = ['ia', 'am', 'mc','co','oo','ol']
+    test = ['ia', 'am', 'mc', 'co', 'oo', 'ol']
+
     enProb = 0
     for i in test:
         firstCharProb = 0
@@ -117,8 +138,59 @@ if whichGram == 2:
             if key[0] == i[0]:
                 firstCharProb += int(value)
 
-        enProb *= int(enList.get(i, 0)) / firstCharProb
+        enProb += math.log((enList.get(i, smooth_value)) / firstCharProb, 10)
     print(enProb)
+
+    esProb = 0
+    for i in test:
+        firstCharProb = 0
+        for key, value in esList.items():
+            if key[0] == i[0]:
+                firstCharProb += int(value)
+
+        esProb += math.log((esList.get(i, smooth_value)) / firstCharProb, 10)
+    print(esProb)
+
+    ptProb = 0
+    for i in test:
+        firstCharProb = 0
+        for key, value in ptList.items():
+            if key[0] == i[0]:
+                firstCharProb += int(value)
+
+        ptProb += math.log((ptList.get(i, smooth_value)) / firstCharProb, 10)
+    print(ptProb)
+
+    euProb = 0
+    for i in test:
+        firstCharProb = 0
+        for key, value in euList.items():
+            if key[0] == i[0]:
+                firstCharProb += int(value)
+
+        euProb += math.log((euList.get(i, smooth_value)) / firstCharProb, 10)
+    print(euProb)
+
+    caProb = 0
+    for i in test:
+        firstCharProb = 0
+        for key, value in caList.items():
+            if key[0] == i[0]:
+                firstCharProb += int(value)
+
+        caProb += math.log((caList.get(i, smooth_value)) / firstCharProb, 10)
+    print(caProb)
+
+    glProb = 0
+    for i in test:
+        firstCharProb = 0
+        for key, value in glList.items():
+            if key[0] == i[0]:
+                firstCharProb += int(value)
+
+        glProb += math.log((glList.get(i, smooth_value)) / firstCharProb, 10)
+    print(glProb)
+
 # print(Counter(enList))
 # print(Counter(esList))
 # print(Counter(ptList))
