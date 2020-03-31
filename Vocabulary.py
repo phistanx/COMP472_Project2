@@ -17,7 +17,9 @@ def read():
         y = line.replace("\t", " ")
         y = y.replace("\n", "")
         x = y.split(" ", 3)
+        # first argument is the vocabulary, x[3] is the message
         message = vocabularies(2, x[3])
+        # x[2] is the language of the tweet
         my_list.append(Language(x[2], message))
     return my_list
 

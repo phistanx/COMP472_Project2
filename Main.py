@@ -11,6 +11,11 @@ def countWords(dictionary):
     return count
 
 
+def addSmoothValue(languagelist, smooth_value):
+    for key, value in languagelist.items():
+        languagelist[key] = value + smooth_value
+
+
 enList = []
 esList = []
 euList = []
@@ -25,10 +30,11 @@ ptCount = 0
 caCount = 0
 glCount = 0
 
+# Create the dictionary of words and their count
 for i in Vocabulary.read():
-    # print(i.message)
     whichGram = 2
     smooth_value = 0.1
+    # create a dictionary of uni/bi/tri-gram
     arr = gram.gram(i.message, whichGram)
     if i.language == 'en':
         enCount += 1
@@ -49,6 +55,7 @@ for i in Vocabulary.read():
         glCount += 1
         glList += arr
 
+# use Counter library to create dictionary with unique keys (character) and the count of the keys
 esList = (Counter(esList))
 enList = (Counter(enList))
 ptList = (Counter(ptList))
@@ -56,24 +63,15 @@ euList = (Counter(euList))
 caList = (Counter(caList))
 glList = (Counter(glList))
 
-for key, value in esList.items():
-    esList[key] = value+smooth_value
+# add the smooth value to each value of the key in the list
+addSmoothValue(esList, smooth_value)
+addSmoothValue(enList, smooth_value)
+addSmoothValue(ptList, smooth_value)
+addSmoothValue(euList, smooth_value)
+addSmoothValue(caList, smooth_value)
+addSmoothValue(glList, smooth_value)
 
-for key, value in enList.items():
-    enList[key] = value+smooth_value
-
-for key, value in ptList.items():
-    ptList[key] = value+smooth_value
-
-for key, value in euList.items():
-    euList[key] = value+smooth_value
-
-for key, value in caList.items():
-    caList[key] = value+smooth_value
-
-for key, value in glList.items():
-    glList[key] = value+smooth_value
-
+# Count how many words there is in that language
 enWords = countWords(enList)
 esWords = countWords(esList)
 ptWords = countWords(ptList)
@@ -81,6 +79,7 @@ euWords = countWords(euList)
 caWords = countWords(caList)
 glWords = countWords(glList)
 
+# create the probability of each language for a tweet
 totalTweet = enCount + esCount + ptCount + euCount + caCount + glCount
 enTweetProb = enCount / totalTweet
 esTweetProb = esCount / totalTweet
@@ -89,12 +88,13 @@ euTweetProb = euCount / totalTweet
 caTweetProb = caCount / totalTweet
 glTweetProb = glCount / totalTweet
 
-# i go to school
+# TODO change this to read value from file
 test = 'iamcool'
+# when gram = 1, apply bayes formula with log of 10
 if whichGram == 1:
     enScore = enTweetProb
     for i in test:
-        enScore += math.log(((enList.get(i, smooth_value)) / enWords),10)
+        enScore += math.log(((enList.get(i, smooth_value)) / enWords), 10)
     print("======")
     print(enScore)
 
@@ -128,7 +128,10 @@ if whichGram == 1:
     print("======")
     print(glScore)
 
+# calculate probability when gram is 2 for each language
+# for loop is to find the probability of the first character of the bigram
 if whichGram == 2:
+    # TODO change this to dynamic value read from file
     test = ['ia', 'am', 'mc', 'co', 'oo', 'ol']
 
     enProb = 0
@@ -139,6 +142,7 @@ if whichGram == 2:
                 firstCharProb += int(value)
 
         enProb += math.log((enList.get(i, smooth_value)) / firstCharProb, 10)
+    print('En value: ')
     print(enProb)
 
     esProb = 0
@@ -149,6 +153,7 @@ if whichGram == 2:
                 firstCharProb += int(value)
 
         esProb += math.log((esList.get(i, smooth_value)) / firstCharProb, 10)
+    print('Es value: ')
     print(esProb)
 
     ptProb = 0
@@ -159,6 +164,7 @@ if whichGram == 2:
                 firstCharProb += int(value)
 
         ptProb += math.log((ptList.get(i, smooth_value)) / firstCharProb, 10)
+    print('Pt value: ')
     print(ptProb)
 
     euProb = 0
@@ -169,6 +175,7 @@ if whichGram == 2:
                 firstCharProb += int(value)
 
         euProb += math.log((euList.get(i, smooth_value)) / firstCharProb, 10)
+    print('Eu value: ')
     print(euProb)
 
     caProb = 0
@@ -179,6 +186,7 @@ if whichGram == 2:
                 firstCharProb += int(value)
 
         caProb += math.log((caList.get(i, smooth_value)) / firstCharProb, 10)
+    print('Ca value: ')
     print(caProb)
 
     glProb = 0
@@ -189,35 +197,5 @@ if whichGram == 2:
                 firstCharProb += int(value)
 
         glProb += math.log((glList.get(i, smooth_value)) / firstCharProb, 10)
+    print('Gl value: ')
     print(glProb)
-
-# print(Counter(enList))
-# print(Counter(esList))
-# print(Counter(ptList))
-# print(Counter(euList))
-# print(Counter(caList))
-# print(Counter(glList))
-#
-# print(enWords)
-# print(esWords)
-# print(ptWords)
-# print(euWords)
-# print(caWords)
-# print(glWords)
-#
-# print("=========")
-#
-# print(enCount)
-# print(esCount)
-# print(ptCount)
-# print(euCount)
-# print(caCount)
-# print(glCount)
-# en ng gl
-#
-# string x = split(gl)
-# x[0] = e
-# int y;
-# for i in map:
-#     if x[0] == i[0]:
-#         y += i.value

@@ -1,10 +1,6 @@
-from collections import Counter
-
-
 def gram(message, n):
     grams = [message[i:i + n] for i in range(len(message) - n + 1)]
     final = removeStar(grams)
-    # print(final)
     return final
 
 
