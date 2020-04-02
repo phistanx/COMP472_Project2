@@ -586,8 +586,8 @@ for i in Vocabulary.read("test-tweets-given.txt"):
     else:
         label = "wrong"
     # TODO read those values dynamically if needed (Double check)
-    solution_line = tweetId + "__" + guess + "__" + "{:.2e}".format(
-        largest_number) + "__" + language + "__" + label + "\n"
+    solution_line = tweetId + "  " + guess + " " + "{:.2e}".format(
+        largest_number) + "  " + language + "  " + label + "\n"
     solution_file.write(solution_line)
     number_tweet += 1
     # TODO Write to Evaluation file
