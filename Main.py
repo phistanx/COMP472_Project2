@@ -97,7 +97,7 @@ gl_f1 = 0
 ca_f1 = 0
 
 solution_file_name = "trace_" + str(vocabulary) + "_" + str(whichGram) + "_" + str(smooth_value) + ".txt"
-solution_file = open(solution_file_name, 'w+')
+solution_file = open(solution_file_name, 'w+', encoding='utf-8')
 
 # Create the dictionary of words and their count
 for i in Vocabulary.read("training-tweets.txt"):
@@ -586,8 +586,8 @@ for i in Vocabulary.read("test-tweets-given.txt"):
     else:
         label = "wrong"
     # TODO read those values dynamically if needed (Double check)
-    solution_line = tweetId + "  " + guess + " " + "{:.2e}".format(
-        largest_number) + "  " + language + "  " + label + "\n"
+    solution_line = tweetId + "  " + str(guess) + " " + "{:.2e}".format(
+        largest_number) + "  " + str(language) + "  " + str(label) + "\n"
     solution_file.write(solution_line)
     number_tweet += 1
     # TODO Write to Evaluation file
@@ -705,7 +705,7 @@ weight_f1 = (
 
 eval_file_name = "eval_" + str(vocabulary) + "_" + str(whichGram) + "_" + str(smooth_value) + ".txt"
 
-eval_file = open(eval_file_name, 'w+')
+eval_file = open(eval_file_name, 'w+',  encoding='utf-8')
 accuracy_line = str(accuracy_percentage) + "\n"
 eval_file.write(accuracy_line)
 
