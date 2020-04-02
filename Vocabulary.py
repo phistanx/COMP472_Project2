@@ -20,7 +20,7 @@ def read(file_name):
             y = y.replace("\n", "")
             x = y.split(" ", 3)
             # first argument is the vocabulary, x[3] is the message
-            message = vocabularies(1, x[3])
+            message = vocabulariesUpdateMessage(1, x[3])
             # x[2] is the language of the tweet
             my_list.append(Language(x[2], message, x[0]))
         except:
@@ -29,7 +29,7 @@ def read(file_name):
     return my_list
 
 
-def vocabularies(vocabulary, message):
+def vocabulariesUpdateMessage(vocabulary, message):
     newMess = ""
     if vocabulary == 0:
         for i in range(len(message)):

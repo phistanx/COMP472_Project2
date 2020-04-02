@@ -33,6 +33,69 @@ glCount = 0
 vocabulary = 1
 whichGram = 1
 smooth_value = 0.1
+# accuracy
+accuracy_numerator = 0
+number_tweet = 0
+accuracy_percentage = 0
+
+# precision
+es_precision = 0
+es_precision_num = 0
+es_precision_den = 0
+
+gl_precision = 0
+gl_precision_num = 0
+gl_precision_den = 0
+
+eu_precision = 0
+eu_precision_num = 0
+eu_precision_den = 0
+
+pt_precision = 0
+pt_precision_num = 0
+pt_precision_den = 0
+
+en_precision = 0
+en_precision_num = 0
+en_precision_den = 0
+
+ca_precision = 0
+ca_precision_num = 0
+ca_precision_den = 0
+
+# Recall
+es_recall = 0
+es_recall_num = 0
+es_recall_den = 0
+
+gl_recall = 0
+gl_recall_num = 0
+gl_recall_den = 0
+
+eu_recall = 0
+eu_recall_num = 0
+eu_recall_den = 0
+
+pt_recall = 0
+pt_recall_num = 0
+pt_recall_den = 0
+
+en_recall = 0
+en_recall_num = 0
+en_recall_den = 0
+
+ca_recall = 0
+ca_recall_num = 0
+ca_recall_den = 0
+
+# F1
+eu_f1 = 0
+en_f1 = 0
+es_f1 = 0
+pt_f1 = 0
+gl_f1 = 0
+ca_f1 = 0
+
 solution_file_name = "trace_" + str(vocabulary) + "_" + str(whichGram) + "_" + str(smooth_value) + ".txt"
 solution_file = open(solution_file_name, 'w+')
 
@@ -523,7 +586,140 @@ for i in Vocabulary.read("test-tweets-given.txt"):
     else:
         label = "wrong"
     # TODO read those values dynamically if needed (Double check)
-    solution_line = tweetId + "__" + guess + "__" + "{:.2e}".format(largest_number) + "__" + language + "__" + label + "\n"
+    solution_line = tweetId + "__" + guess + "__" + "{:.2e}".format(
+        largest_number) + "__" + language + "__" + label + "\n"
     solution_file.write(solution_line)
-
+    number_tweet += 1
     # TODO Write to Evaluation file
+    # accuracy
+    if label == "correct":
+        accuracy_numerator += 1
+
+    # Precision
+    if guess == "es":
+        es_precision_den += 1
+        if label == "correct":
+            es_precision_num += 1
+
+    if guess == "ca":
+        ca_precision_den += 1
+        if label == "correct":
+            ca_precision_num += 1
+
+    if guess == "en":
+        en_precision_den += 1
+        if label == "correct":
+            en_precision_num += 1
+
+    if guess == "eu":
+        eu_precision_den += 1
+        if label == "correct":
+            eu_precision_num += 1
+
+    if guess == "gl":
+        gl_precision_den += 1
+        if label == "correct":
+            gl_precision_num += 1
+
+    if guess == "pt":
+        pt_precision_den += 1
+        if label == "correct":
+            pt_precision_num += 1
+
+    # Recall 
+    if language == "es":
+        es_recall_den += 1
+        if label == "correct":
+            es_recall_num += 1
+
+    if language == "en":
+        en_recall_den += 1
+        if label == "correct":
+            en_recall_num += 1
+
+    if language == "pt":
+        pt_recall_den += 1
+        if label == "correct":
+            pt_recall_num += 1
+
+    if language == "eu":
+        eu_recall_den += 1
+        if label == "correct":
+            eu_recall_num += 1
+
+    if language == "ca":
+        ca_recall_den += 1
+        if label == "correct":
+            ca_recall_num += 1
+
+    if language == "gl":
+        gl_recall_den += 1
+        if label == "correct":
+            gl_recall_num += 1
+
+accuracy_percentage = accuracy_numerator / number_tweet
+
+en_precision = en_precision_num / en_precision_den
+eu_precision = eu_precision_num / eu_precision_den
+gl_precision = gl_precision_num / gl_precision_den
+pt_precision = pt_precision_num / pt_precision_den
+es_precision = es_precision_num / es_precision_den
+ca_precision = ca_precision_num / ca_precision_den
+
+gl_recall = gl_recall_num / gl_recall_den
+ca_recall = ca_recall_num / ca_recall_den
+eu_recall = eu_recall_num / eu_recall_den
+pt_recall = pt_recall_num / pt_recall_den
+es_recall = es_recall_num / es_recall_den
+en_recall = en_recall_num / en_recall_den
+# F1-measure
+try:
+    es_f1 = (2 * es_precision * es_recall) / (es_precision + es_recall)
+except:
+    es_f1 = 0
+try:
+    gl_f1 = (2 * gl_precision * gl_recall) / (gl_precision + gl_recall)
+except:
+    gl_f1 = 0
+try:
+    pt_f1 = (2 * pt_precision * pt_recall) / (pt_precision + pt_recall)
+except:
+    pt_f1 = 0
+try:
+    ca_f1 = (2 * ca_precision * ca_recall) / (ca_precision + ca_recall)
+except:
+    ca_f1 = 0
+try:
+    eu_f1 = (2 * eu_precision * eu_recall) / (eu_precision + eu_recall)
+except:
+    eu_f1 = 0
+try:
+    en_f1 = (2 * en_precision * en_recall) / (en_precision + en_recall)
+except:
+    en_f1 = 0
+
+# Macro F1 weighted-average F1
+macro_f1 = (es_f1 + en_f1 + eu_f1 + pt_f1 + ca_f1 + gl_f1) / 6
+weight_f1 = (
+                    es_recall_den * es_f1 + en_precision_den * en_f1 + eu_recall_den * eu_f1 + ca_recall_den * ca_f1 + gl_recall_den * gl_f1) / number_tweet
+
+eval_file_name = "eval_" + str(vocabulary) + "_" + str(whichGram) + "_" + str(smooth_value) + ".txt"
+
+eval_file = open(eval_file_name, 'w+')
+accuracy_line = str(accuracy_percentage) + "\n"
+eval_file.write(accuracy_line)
+
+precision_line = str(eu_precision) + "  " + str(ca_precision) + "  " + str(gl_precision) + "  " + str(
+    es_precision) + "  " + str(en_precision) + "  " + str(pt_precision) + "  " + "\n"
+eval_file.write(precision_line)
+
+recall_line = str(eu_recall) + "  " + str(ca_recall) + "  " + str(gl_recall) + "  " + str(
+    es_recall) + "  " + str(en_recall) + "  " + str(pt_recall) + "  " + "\n"
+eval_file.write(recall_line)
+
+f1_line = str(eu_f1) + "  " + str(ca_f1) + "  " + str(gl_f1) + "  " + str(
+    es_f1) + "  " + str(en_f1) + "  " + str(pt_f1) + "  " + "\n"
+eval_file.write(f1_line)
+
+macro_average_line = str(macro_f1) + "  " + str(weight_f1)
+eval_file.write(macro_average_line)
