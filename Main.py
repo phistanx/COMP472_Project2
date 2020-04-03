@@ -155,12 +155,12 @@ euTweetProb = euCount / totalTweet
 caTweetProb = caCount / totalTweet
 glTweetProb = glCount / totalTweet
 
-enScore = 0
-esScore = 0
-euScore = 0
-ptScore = 0
-caScore = 0
-glScore = 0
+enScore = math.log(enTweetProb, 10)
+esScore = math.log(esTweetProb, 10)
+euScore = math.log(euTweetProb, 10)
+ptScore = math.log(ptTweetProb, 10)
+caScore = math.log(caTweetProb, 10)
+glScore = math.log(glTweetProb, 10)
 
 # Evaluate Test tweets
 for i in Vocabulary.read("test-tweets-given.txt"):
@@ -637,8 +637,10 @@ for i in Vocabulary.read("test-tweets-given.txt"):
             gl_recall_num += 1
 
 accuracy_percentage = accuracy_numerator / number_tweet
-
-en_precision = en_precision_num / en_precision_den
+try:
+    en_precision = en_precision_num / en_precision_den
+except:
+    en_precision = 0
 try:
     eu_precision = eu_precision_num / eu_precision_den
 except:
