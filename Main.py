@@ -104,7 +104,7 @@ languages = {
 }
 
 vocabulary = 2
-whichGram = 1
+whichGram = 2
 smooth_value = 0.1
 # accuracy
 accuracy_numerator = 0
@@ -150,71 +150,17 @@ for i in Vocabulary.read(test_tweet, vocabulary):
     # calculate probability when gram is 2 for each language
     # for loop is to find the probability of the first character of the bigram
     if whichGram == 2:
-        enProb = 0
+        # test = ["ab',"cd"]
         for i in test:
             firstCharCount = 0
-            for key, value in enList.items():
-                if key[0] == i[0]:
-                    firstCharCount += int(value)
-
-            enProb += math.log((enList.get(i, smooth_value)) / firstCharCount, 10)
-        print('En value: ')
-        print(enProb)
-
-        esProb = 0
-        for i in test:
-            firstCharCount = 0
-            for key, value in esList.items():
-                if key[0] == i[0]:
-                    firstCharCount += int(value)
-
-            esProb += math.log((esList.get(i, smooth_value)) / firstCharCount, 10)
-        print('Es value: ')
-        print(esProb)
-
-        ptProb = 0
-        for i in test:
-            firstCharCount = 0
-            for key, value in ptList.items():
-                if key[0] == i[0]:
-                    firstCharCount += int(value)
-
-            ptProb += math.log((ptList.get(i, smooth_value)) / firstCharCount, 10)
-        print('Pt value: ')
-        print(ptProb)
-
-        euProb = 0
-        for i in test:
-            firstCharCount = 0
-            for key, value in euList.items():
-                if key[0] == i[0]:
-                    firstCharCount += int(value)
-
-            euProb += math.log((euList.get(i, smooth_value)) / firstCharCount, 10)
-        print('Eu value: ')
-        print(euProb)
-
-        caProb = 0
-        for i in test:
-            firstCharCount = 0
-            for key, value in caList.items():
-                if key[0] == i[0]:
-                    firstCharCount += int(value)
-
-            caProb += math.log((caList.get(i, smooth_value)) / firstCharCount, 10)
-        print('Ca value: ')
-        print(caProb)
-
-        glProb = 0
-        for i in test:
-            firstCharCount = 0
-            for key, value in glList.items():
-                if key[0] == i[0]:
-                    firstCharCount += int(value)
-
-            glProb += math.log((glList.get(i, smooth_value)) / firstCharCount, 10)
-        print('Gl value: ')
-        print(glProb)
+            for lang, value in languages.items():
+                for key, value in languages[lang]["list"].items():
+                    if key[0] == i[0]:
+                        firstCharCount += int(value)
+                try:
+                    languages[lang]["score"] += math.log((languages[lang]["list"].get(i, smooth_value)) / firstCharCount, 10)
+                except:
+                    print("NO First charCount for " + i[0])
 
     if whichGram == 3:
         enList2 = []
