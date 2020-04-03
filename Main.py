@@ -4,6 +4,7 @@ from collections import Counter
 import math
 import evaluation
 
+
 def countWords(dictionary):
     count = 0
     for key, value in dictionary.items():
@@ -151,16 +152,18 @@ for i in Vocabulary.read(test_tweet, vocabulary):
     # for loop is to find the probability of the first character of the bigram
     if whichGram == 2:
         # test = ["ab',"cd"]
+
         for i in test:
             firstCharCount = 0
             for lang, value in languages.items():
-                for key, value in languages[lang]["list"].items():
-                    if key[0] == i[0]:
-                        firstCharCount += int(value)
+                newdic = {k: v for k, v in languages[lang]["list"].items() if k[0] == i[0]}
+                for key, count in newdic.items():
+                    firstCharCount += int(count)
                 try:
-                    languages[lang]["score"] += math.log((languages[lang]["list"].get(i, smooth_value)) / firstCharCount, 10)
+                    languages[lang]["score"] += math.log(
+                        (languages[lang]["list"].get(i, smooth_value)) / firstCharCount, 10)
                 except:
-                    print("NO First charCount for " + i[0])
+                    pass
 
     if whichGram == 3:
         enList2 = []
