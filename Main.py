@@ -155,6 +155,13 @@ euTweetProb = euCount / totalTweet
 caTweetProb = caCount / totalTweet
 glTweetProb = glCount / totalTweet
 
+enScore = math.log(enTweetProb, 10)
+esScore = math.log(esTweetProb, 10)
+euScore = math.log(euTweetProb, 10)
+ptScore = math.log(ptTweetProb, 10)
+caScore = math.log(caTweetProb, 10)
+glScore = math.log(glTweetProb, 10)
+
 # Evaluate Test tweets
 for i in Vocabulary.read("test-tweets-given.txt"):
     print('=====================')
@@ -164,41 +171,13 @@ for i in Vocabulary.read("test-tweets-given.txt"):
     # i = 439379404574453760	aritzabrodes	es	@AnderDelPozo @PesqueWhite hahaha yo tambien me he quedao pillao ahahha
     # when gram = 1, apply bayes formula with log of 10
     if whichGram == 1:
-        enScore = enTweetProb
         for i in test:
             enScore += math.log(((enList.get(i, smooth_value)) / enWords), 10)
-        print("===EN===")
-        print(enScore)
-
-        esScore = esTweetProb
-        for i in test:
             esScore += math.log(((esList.get(i, smooth_value)) / esWords), 10)
-        print("===ES===")
-        print(esScore)
-
-        ptScore = ptTweetProb
-        for i in test:
             ptScore += math.log(((ptList.get(i, smooth_value)) / ptWords), 10)
-        print("===PT===")
-        print(ptScore)
-
-        euScore = euTweetProb
-        for i in test:
             euScore += math.log(((euList.get(i, smooth_value)) / euWords), 10)
-        print("===EU===")
-        print(euScore)
-
-        caScore = caTweetProb
-        for i in test:
             caScore += math.log(((caList.get(i, smooth_value)) / caWords), 10)
-        print("===CA===")
-        print(caScore)
-
-        glScore = glTweetProb
-        for i in test:
             glScore += math.log(((glList.get(i, smooth_value)) / glWords), 10)
-        print("===GL===")
-        print(glScore)
 
     # calculate probability when gram is 2 for each language
     # for loop is to find the probability of the first character of the bigram
@@ -658,13 +637,30 @@ for i in Vocabulary.read("test-tweets-given.txt"):
             gl_recall_num += 1
 
 accuracy_percentage = accuracy_numerator / number_tweet
-
-en_precision = en_precision_num / en_precision_den
-eu_precision = eu_precision_num / eu_precision_den
-gl_precision = gl_precision_num / gl_precision_den
-pt_precision = pt_precision_num / pt_precision_den
-es_precision = es_precision_num / es_precision_den
-ca_precision = ca_precision_num / ca_precision_den
+try:
+    en_precision = en_precision_num / en_precision_den
+except:
+    en_precision = 0
+try:
+    eu_precision = eu_precision_num / eu_precision_den
+except:
+    eu_precision = 0
+try:
+    gl_precision = gl_precision_num / gl_precision_den
+except:
+    gl_precision = 0
+try:
+    pt_precision = pt_precision_num / pt_precision_den
+except:
+    pt_precision = 0
+try:
+    es_precision = es_precision_num / es_precision_den
+except:
+    es_precision = 0
+try:
+    ca_precision = ca_precision_num / ca_precision_den
+except:
+    ca_precision = 0
 
 gl_recall = gl_recall_num / gl_recall_den
 ca_recall = ca_recall_num / ca_recall_den
@@ -705,7 +701,7 @@ weight_f1 = (
 
 eval_file_name = "eval_" + str(vocabulary) + "_" + str(whichGram) + "_" + str(smooth_value) + ".txt"
 
-eval_file = open(eval_file_name, 'w+',  encoding='utf-8')
+eval_file = open(eval_file_name, 'w+', encoding='utf-8')
 accuracy_line = str(accuracy_percentage) + "\n"
 eval_file.write(accuracy_line)
 
