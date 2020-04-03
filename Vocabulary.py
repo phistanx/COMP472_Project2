@@ -11,7 +11,7 @@ class Language:
         self.message = message
         self.tweetId = tweetId
 
-def read(file_name):
+def read(file_name, vocabulary):
     file = open(file_name, 'r', encoding="utf-8")
     my_list = []
     for line in file:
@@ -20,7 +20,7 @@ def read(file_name):
             y = y.replace("\n", "")
             x = y.split(" ", 3)
             # first argument is the vocabulary, x[3] is the message
-            message = vocabulariesUpdateMessage(1, x[3])
+            message = vocabulariesUpdateMessage(vocabulary, x[3])
             # x[2] is the language of the tweet
             my_list.append(Language(x[2], message, x[0]))
         except:

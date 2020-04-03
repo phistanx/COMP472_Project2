@@ -103,7 +103,7 @@ languages = {
     }
 }
 
-vocabulary = 0
+vocabulary = 2
 whichGram = 1
 smooth_value = 0.1
 # accuracy
@@ -118,7 +118,7 @@ training_tweet = "training-tweets.txt"
 test_tweet = "test-tweets-given.txt"
 
 # Create the dictionary of words and their count
-for i in Vocabulary.read(training_tweet):
+for i in Vocabulary.read(training_tweet, vocabulary):
     # create a dictionary of uni/bi/tri-gram
     languages[i.language]["count"] += 1
     languages[i.language]["list"] += gram.gram(i.message, whichGram)
@@ -135,7 +135,7 @@ for key, value in languages.items():
     languages[key]["tweetProb"] = languages[key]["count"] / totalTweet
 
 # Evaluate Test tweets
-for i in Vocabulary.read(test_tweet):
+for i in Vocabulary.read(test_tweet, vocabulary):
     tweetId = i.tweetId
     language = i.language
     test = gram.gram(i.message, whichGram)
