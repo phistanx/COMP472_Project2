@@ -2,12 +2,15 @@ def writeToEvaluationFile(languages, whichGram, number_tweet, smooth_value, voca
     macro_f1 = 0
     weight_f1 = 0
     for key, value in languages.items():
-        languages[key]["precision"] = languages[key]["precisionNum"] / languages[key]["precisionDen"]
-        languages[key]["recall"] = languages[key]["recallNum"] / languages[key]["recallDen"]
-        languages[key]["f1"] = (2 * languages[key]["precision"] * languages[key]["recall"]) / (
-                languages[key]["precision"] + languages[key]["recall"])
-        macro_f1 += languages[key]["f1"]
-        weight_f1 += languages[key]["f1"] * languages[key]["precisionDen"]
+        try:
+            languages[key]["precision"] = languages[key]["precisionNum"] / languages[key]["precisionDen"]
+            languages[key]["recall"] = languages[key]["recallNum"] / languages[key]["recallDen"]
+            languages[key]["f1"] = (2 * languages[key]["precision"] * languages[key]["recall"]) / (
+                    languages[key]["precision"] + languages[key]["recall"])
+            macro_f1 += languages[key]["f1"]
+            weight_f1 += languages[key]["f1"] * languages[key]["precisionDen"]
+        except:
+            print("An error in writing to evaluation")
 
     macro_f1 = macro_f1 / 6
     weight_f1 = weight_f1 / number_tweet

@@ -115,7 +115,7 @@ solution_file_name = "trace_" + str(vocabulary) + "_" + str(whichGram) + "_" + s
 solution_file = open("trace/" + solution_file_name, 'w+', encoding='utf-8')
 
 training_tweet = "training-tweets.txt"
-test_tweet = "test-tweets.given.txt"
+test_tweet = "test-tweets-given.txt"
 
 # Create the dictionary of words and their count
 for i in Vocabulary.read(training_tweet):
@@ -135,7 +135,7 @@ for key, value in languages.items():
     languages[key]["tweetProb"] = languages[key]["count"] / totalTweet
 
 # Evaluate Test tweets
-for i in Vocabulary.read(training_tweet):
+for i in Vocabulary.read(test_tweet):
     tweetId = i.tweetId
     language = i.language
     test = gram.gram(i.message, whichGram)
