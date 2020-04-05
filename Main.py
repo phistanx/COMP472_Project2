@@ -202,7 +202,8 @@ for i in Vocabulary.read(test_tweet, vocabulary):
                 except:
                     pass
                 if vocabulary == 3:
-                    diff_lang = ['Ç', 'ü', 'é', 'â', 'ä', 'à', 'ç', 'ê', 'ë', 'è', 'ï', 'î', 'ì', 'Ä', 'Å', 'É', 'ô', 'ö',
+                    diff_lang = ['Ç', 'ü', 'é', 'â', 'ä', 'à', 'ç', 'ê', 'ë', 'è', 'ï', 'î', 'ì', 'Ä', 'Å', 'É', 'ô',
+                                 'ö',
                                  'ò', 'û', 'ù', 'ÿ', 'Ö', 'Ü', 'á', 'í', 'ó', 'ú', 'ñ', 'Ñ']
                     if 1 in [c in dummy_message for c in diff_lang]:
                         languages["en"]["score"] = -100000
@@ -219,7 +220,8 @@ for i in Vocabulary.read(test_tweet, vocabulary):
         for val in test:
             for lang, value in languages.items():
                 # P(C)
-                languages[lang]["score"] += math.log(languages[lang]["triAB"].get(val[0], smooth_value)/ languages[lang]["words"], 10) * 0.1
+                languages[lang]["score"] += math.log(
+                    languages[lang]["triAB"].get(val[0], smooth_value) / languages[lang]["words"], 10) * 0.1
 
                 # P(C |B )
                 firstCharCount = 0
@@ -228,13 +230,13 @@ for i in Vocabulary.read(test_tweet, vocabulary):
                     firstCharCount += int(count)
                 try:
                     languages[lang]["score"] += math.log(
-                        (languages[lang]["triList"].get(val[0]+val[1], smooth_value)) / firstCharCount, 10) * 0.3
+                        (languages[lang]["triList"].get(val[0] + val[1], smooth_value)) / firstCharCount, 10) * 0.3
                 except:
                     pass
 
                 # P(C |A,B ) = P(ABC) / P(start AB)
                 firstCharCount = 0
-                newdic = {k: v for k, v in languages[lang]["list"].items() if (k[0]+k[1]) == val[0]+val[1]}
+                newdic = {k: v for k, v in languages[lang]["list"].items() if (k[0] + k[1]) == val[0] + val[1]}
                 for key, count in newdic.items():
                     firstCharCount += int(count)
                 try:
@@ -296,14 +298,13 @@ for i in Vocabulary.read(test_tweet, vocabulary):
     else:
         label = "wrong"
 
-    # TODO read those values dynamically if needed (Double check)
+    # write to trace file
     solution_line = tweetId + "  " + str(guess) + " " + "{:.2e}".format(
         largest_number) + "  " + str(language) + "  " + str(label) + "\n"
     solution_file.write(solution_line)
     number_tweet += 1
-    print(label + "  " + guess)
 
-    # TODO Write to Evaluation file
+    # Write to Evaluation file
     # accuracy
     if label == "correct":
         accuracy_numerator += 1
