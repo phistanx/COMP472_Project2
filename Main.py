@@ -30,7 +30,11 @@ languages = {
         "recall": 0,
         "recallDen": 0,
         "recallNum": 0,
-        "f1": 0
+        "f1": 0,
+        "triList": [],
+        "triAB": [],
+        "triBC": 0,
+        "triBstar": 0
     },
     "es": {
         "count": 0,
@@ -43,8 +47,12 @@ languages = {
         "precisionNum": 0,
         "recall": 0,
         "recallDen": 0,
-        "recallNum":0,
-        "f1": 0
+        "recallNum": 0,
+        "f1": 0,
+        "triList": [],
+        "triAB": [],
+        "triBC": 0,
+        "triBstar": 0
     },
     "pt": {
         "count": 0,
@@ -58,7 +66,11 @@ languages = {
         "recall": 0,
         "recallDen": 0,
         "recallNum": 0,
-        "f1": 0
+        "f1": 0,
+        "triList": [],
+        "triAB": [],
+        "triBC": 0,
+        "triBstar": 0
     },
     "eu": {
         "count": 0,
@@ -72,7 +84,11 @@ languages = {
         "recall": 0,
         "recallDen": 0,
         "recallNum": 0,
-        "f1": 0
+        "f1": 0,
+        "triList": [],
+        "triAB": [],
+        "triBC": 0,
+        "triBstar": 0
     },
     "ca": {
         "count": 0,
@@ -86,7 +102,11 @@ languages = {
         "recall": 0,
         "recallDen": 0,
         "recallNum": 0,
-        "f1": 0
+        "f1": 0,
+        "triList": [],
+        "triAB": [],
+        "triBC": 0,
+        "triBstar": 0
     },
     "gl": {
         "count": 0,
@@ -100,13 +120,17 @@ languages = {
         "recall": 0,
         "recallDen": 0,
         "recallNum": 0,
-        "f1": 0
+        "f1": 0,
+        "triList": [],
+        "triAB": [],
+        "triBC": 0,
+        "triBstar": 0
     }
 }
 
-vocabulary = 2
-whichGram = 2
-smooth_value = 0.1
+vocabulary = 0
+whichGram = 1
+smooth_value = 0
 # accuracy
 accuracy_numerator = 0
 number_tweet = 0
@@ -135,6 +159,17 @@ for key, value in languages.items():
     languages[key]["words"] = countWords(languages[key]["list"])
     languages[key]["tweetProb"] = languages[key]["count"] / totalTweet
 
+if whichGram == 3:
+    for tweet in Vocabulary.read(training_tweet, vocabulary):
+        languages[tweet.language]["triList"] += gram.gram(tweet.message, 2)
+        languages[tweet.language]["triAB"] += gram.gram(tweet.message, 1)
+
+    for key, value in languages.items():
+        languages[key]["triList"] = (Counter(languages[key]["triList"]))
+        addSmoothValue(languages[key]["triList"], smooth_value)
+        languages[key]["triAB"] = (Counter(languages[key]["triAB"]))
+        addSmoothValue(languages[key]["triAB"], smooth_value)
+
 # Evaluate Test tweets
 for i in Vocabulary.read(test_tweet, vocabulary):
     tweetId = i.tweetId
@@ -152,10 +187,11 @@ for i in Vocabulary.read(test_tweet, vocabulary):
     # for loop is to find the probability of the first character of the bigram
     if whichGram == 2:
         # test = ["ab',"cd"]
-
+        for key, value in languages.items():
+            languages[key]["score"] = math.log(languages[key]["tweetProb"], 10)
         for i in test:
-            firstCharCount = 0
             for lang, value in languages.items():
+                firstCharCount = 0
                 newdic = {k: v for k, v in languages[lang]["list"].items() if k[0] == i[0]}
                 for key, count in newdic.items():
                     firstCharCount += int(count)
@@ -166,299 +202,78 @@ for i in Vocabulary.read(test_tweet, vocabulary):
                     pass
 
     if whichGram == 3:
-        enList2 = []
-        enCount2 = 0
-        # Create the dictionary of words and their count
-        for i in Vocabulary.read():
-            whichGram = 2
-            smooth_value = 0.1
-            # create a dictionary of uni/bi/tri-gram
-            arr = gram.gram(i.message, whichGram)
-            if i.language == 'en':
-                enCount2 += 1
-                enList2 += arr
+        # Tri-gram P(ABC) = P(AB) * P(BC) / P(B*), B* = all tri-grams starting with B
+        # AB list
+        # building the bi-gram list
 
-        # use Counter library to create dictionary with unique keys (character) and the count of the keys
-        enList2 = (Counter(enList2))
+        for key, value in languages.items():
+            languages[key]["score"] = math.log(languages[key]["tweetProb"], 10)
 
-        # add the smooth value to each value of the key in the list
-        addSmoothValue(enList2, smooth_value)
-        # TODO change this to dynamic value read from file
-        test = ['iam']
-        enProb = 0
-        for i in test:
-            # enList2 = BIGRAM list, enList = TRIGRAM list
-            firstCharProb = 0
-            for key, value in enList2.items():
-                if key[0] == i[0]:
-                    firstCharProb += int(value)
-            # ia
-            enProb = math.log((enList2.get(i, smooth_value)) / firstCharProb, 10)
+        for val in test:
+            for lang, value in languages.items():
+                # P(C)
+                languages[lang]["score"] += math.log(languages[lang]["triAB"].get(val[0], smooth_value)/ languages[lang]["words"], 10) * 0.1
 
-        enProb2 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in enList2.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            # am
-            enProb2 = math.log((enList2.get(i, smooth_value)) / firstCharProb, 10)
-        enProb3 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in enList.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            enProb3 += math.log((enList.get(i, smooth_value)) / firstCharProb, 10)
+                # P(C |B )
+                firstCharCount = 0
+                newdic = {k: v for k, v in languages[lang]["triList"].items() if k[0] == val[0]}
+                for key, count in newdic.items():
+                    firstCharCount += int(count)
+                try:
+                    languages[lang]["score"] += math.log(
+                        (languages[lang]["triList"].get(val[0]+val[1], smooth_value)) / firstCharCount, 10) * 0.3
+                except:
+                    pass
 
-        trigramProb = enProb * enProb2 / enProb3
-        print('En value: ')
-        print(trigramProb)
-
-        esList2 = []
-        esCount2 = 0
-        # Create the dictionary of words and their count
-        for i in Vocabulary.read():
-            whichGram = 2
-            smooth_value = 0.1
-            # create a dictionary of uni/bi/tri-gram
-            arr = gram.gram(i.message, whichGram)
-            if i.language == 'es':
-                esCount2 += 1
-                esList2 += arr
-
-        # use Counter library to create dictionary with unique keys (character) and the count of the keys
-        esList2 = (Counter(esList2))
-
-        # add the smooth value to each value of the key in the list
-        addSmoothValue(esList2, smooth_value)
-        # TODO change this to dynamic value read from file
-        test = ['iam']
-        esProb = 0
-        for i in test:
-            # enList2 = BIGRAM list, enList = TRIGRAM list
-            firstCharProb = 0
-            for key, value in esList2.items():
-                if key[0] == i[0]:
-                    firstCharProb += int(value)
-            # ia
-            esProb = math.log((esList2.get(i, smooth_value)) / firstCharProb, 10)
-
-        esProb2 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in esList2.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            # am
-            esProb2 = math.log((esList2.get(i, smooth_value)) / firstCharProb, 10)
-        esProb3 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in esList.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            esProb3 += math.log((esList.get(i, smooth_value)) / firstCharProb, 10)
-
-        trigramProb = esProb * esProb2 / esProb3
-        print('Es value: ')
-        print(trigramProb)
-
-        ptList2 = []
-        ptCount2 = 0
-        # Create the dictionary of words and their count
-        for i in Vocabulary.read():
-            whichGram = 2
-            smooth_value = 0.1
-            # create a dictionary of uni/bi/tri-gram
-            arr = gram.gram(i.message, whichGram)
-            if i.language == 'pt':
-                ptCount2 += 1
-                ptList2 += arr
-
-        # use Counter library to create dictionary with unique keys (character) and the count of the keys
-        ptList2 = (Counter(ptList2))
-
-        # add the smooth value to each value of the key in the list
-        addSmoothValue(ptList2, smooth_value)
-        # TODO change this to dynamic value read from file
-        test = ['iam']
-        ptProb = 0
-        for i in test:
-            # ptList2 = BIGRAM list, ptList = TRIGRAM list
-            firstCharProb = 0
-            for key, value in ptList2.items():
-                if key[0] == i[0]:
-                    firstCharProb += int(value)
-            # ia
-            ptProb = math.log((ptList2.get(i, smooth_value)) / firstCharProb, 10)
-
-        ptProb2 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in ptList2.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            # am
-            ptProb2 = math.log((ptList2.get(i, smooth_value)) / firstCharProb, 10)
-        ptProb3 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in ptList.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            ptProb3 += math.log((ptList.get(i, smooth_value)) / firstCharProb, 10)
-
-        trigramProb = ptProb * ptProb2 / ptProb3
-        print('pt value: ')
-        print(trigramProb)
-
-        euList2 = []
-        euCount2 = 0
-        # Create the dictionary of words and their count
-        for i in Vocabulary.read():
-            whichGram = 2
-            smooth_value = 0.1
-            # create a dictionary of uni/bi/tri-gram
-            arr = gram.gram(i.message, whichGram)
-            if i.language == 'eu':
-                euCount2 += 1
-                euList2 += arr
-
-        # use Counter library to create dictionary with unique keys (character) and the count of the keys
-        euList2 = (Counter(euList2))
-
-        # add the smooth value to each value of the key in the list
-        addSmoothValue(euList2, smooth_value)
-        # TODO change this to dynamic value read from file
-        test = ['iam']
-        euProb = 0
-        for i in test:
-            # euList2 = BIGRAM list, euList = TRIGRAM list
-            firstCharProb = 0
-            for key, value in euList2.items():
-                if key[0] == i[0]:
-                    firstCharProb += int(value)
-            # ia
-            euProb = math.log((euList2.get(i, smooth_value)) / firstCharProb, 10)
-
-        euProb2 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in euList2.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            # am
-            euProb2 = math.log((euList2.get(i, smooth_value)) / firstCharProb, 10)
-        euProb3 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in euList.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            euProb3 += math.log((euList.get(i, smooth_value)) / firstCharProb, 10)
-
-        trigramProb = euProb * euProb2 / euProb3
-        print('eu value: ')
-        print(trigramProb)
-
-        caList2 = []
-        caCount2 = 0
-        # Create the dictionary of words and their count
-        for i in Vocabulary.read():
-            whichGram = 2
-            smooth_value = 0.1
-            # create a dictionary of uni/bi/tri-gram
-            arr = gram.gram(i.message, whichGram)
-            if i.language == 'ca':
-                caCount2 += 1
-                caList2 += arr
-
-        # use Counter library to create dictionary with unique keys (character) and the count of the keys
-        caList2 = (Counter(caList2))
-
-        # add the smooth value to each value of the key in the list
-        addSmoothValue(caList2, smooth_value)
-        # TODO change this to dynamic value read from file
-        test = ['iam']
-        caProb = 0
-        for i in test:
-            # caList2 = BIGRAM list, caList = TRIGRAM list
-            firstCharProb = 0
-            for key, value in caList2.items():
-                if key[0] == i[0]:
-                    firstCharProb += int(value)
-            # ia
-            caProb = math.log((caList2.get(i, smooth_value)) / firstCharProb, 10)
-
-        caProb2 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in caList2.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            # am
-            caProb2 = math.log((caList2.get(i, smooth_value)) / firstCharProb, 10)
-        caProb3 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in caList.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            caProb3 += math.log((caList.get(i, smooth_value)) / firstCharProb, 10)
-
-        trigramProb = caProb * caProb2 / caProb3
-        print('ca value: ')
-        print(trigramProb)
-
-        glList2 = []
-        glCount2 = 0
-        # Create the dictionary of words and their count
-        for i in Vocabulary.read():
-            whichGram = 2
-            smooth_value = 0.1
-            # create a dictionary of uni/bi/tri-gram
-            arr = gram.gram(i.message, whichGram)
-            if i.language == 'gl':
-                glCount2 += 1
-                glList2 += arr
-
-        # use Counter library to create dictionary with unique keys (character) and the count of the keys
-        glList2 = (Counter(glList2))
-
-        # add the smooth value to each value of the key in the list
-        addSmoothValue(glList2, smooth_value)
-        # TODO change this to dynamic value read from file
-        test = ['iam']
-        glProb = 0
-        for i in test:
-            # glList2 = BIGRAM list, glList = TRIGRAM list
-            firstCharProb = 0
-            for key, value in glList2.items():
-                if key[0] == i[0]:
-                    firstCharProb += int(value)
-            # ia
-            glProb = math.log((glList2.get(i, smooth_value)) / firstCharProb, 10)
-
-        glProb2 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in glList2.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            # am
-            glProb2 = math.log((glList2.get(i, smooth_value)) / firstCharProb, 10)
-        glProb3 = 0
-        for i in test:
-            firstCharProb = 0
-            for key, value in glList.items():
-                if key[0] == i[1]:
-                    firstCharProb += int(value)
-            glProb3 += math.log((glList.get(i, smooth_value)) / firstCharProb, 10)
-
-        trigramProb = glProb * glProb2 / glProb3
-        print('gl value: ')
-        print(trigramProb)
+                # P(C |A,B ) = P(ABC) / P(start AB)
+                firstCharCount = 0
+                newdic = {k: v for k, v in languages[lang]["list"].items() if (k[0]+k[1]) == val[0]+val[1]}
+                for key, count in newdic.items():
+                    firstCharCount += int(count)
+                try:
+                    languages[lang]["score"] += math.log(
+                        (languages[lang]["list"].get(val, smooth_value)) / firstCharCount, 10) * 0.6
+                except:
+                    pass
+            # firstCharCount = 0
+            # ABtrigram = val[0] + val[1]
+            # BCtrigram = val[1] + val[2]
+            # for lang, value in languages.items():
+            #     languages[lang]["triAB"] = 0
+            #     newdic = {k: v for k, v in languages[lang]["triList"].items() if k[0] == val[0]}
+            #     for key, count in newdic.items():
+            #         firstCharCount += int(count)
+            #     try:
+            #         languages[lang]["triAB"] = (languages[lang]["triList"].get(ABtrigram, smooth_value)) / firstCharCount
+            #     except:
+            #         pass
+            #
+            # for lang, value in languages.items():
+            #     languages[lang]["triBC"] = 0
+            #     newdic = {k: v for k, v in languages[lang]["triList"].items() if k[0] == val[1]}
+            #     for key, count in newdic.items():
+            #         firstCharCount += int(count)
+            #     try:
+            #         languages[lang]["triBC"] = (languages[lang]["triList"].get(BCtrigram,
+            #                                                                    smooth_value)) / firstCharCount
+            #     except:
+            #         pass
+            #
+            # for lang, value in languages.items():
+            #     languages[lang]["triBstar"] = 0
+            #     for key, value in languages[lang]["list"].items():
+            #         if key[0] == val[1]:
+            #             languages[lang]["triBstar"] += int(value)
+            #     try:
+            #         languages[lang]["triBstar"] = languages[lang]["triBstar"] / languages[lang]["words"]
+            #     except:
+            #         languages[lang]["triBstar"] = -5
+            #
+            # for lang, value in languages.items():
+            #     try:
+            #         languages[lang]["score"] += math.log(languages[lang]["triAB"] * languages[lang]["triBC"] / (languages[lang]["triBstar"]), 10)
+            #     except:
+            #         pass
 
     # TODO Write to Trace File
     # It needs: tweet Id, the guess, the value, the real language, wrong/correct
@@ -479,6 +294,7 @@ for i in Vocabulary.read(test_tweet, vocabulary):
         largest_number) + "  " + str(language) + "  " + str(label) + "\n"
     solution_file.write(solution_line)
     number_tweet += 1
+    print(label + "  " + guess)
 
     # TODO Write to Evaluation file
     # accuracy
@@ -496,8 +312,10 @@ for i in Vocabulary.read(test_tweet, vocabulary):
             languages[key]["recallDen"] += 1
             if label == "correct":
                 languages[key]["recallNum"] += 1
-
-accuracy_percentage = accuracy_numerator / number_tweet
+try:
+    accuracy_percentage = accuracy_numerator / number_tweet
+except:
+    pass
 
 evaluation.writeToEvaluationFile(languages, whichGram, number_tweet, smooth_value, vocabulary, accuracy_percentage)
 
