@@ -128,9 +128,9 @@ languages = {
     }
 }
 
-vocabulary = 0
-whichGram = 1
-smooth_value = 0
+vocabulary = 2
+whichGram = 2
+smooth_value = 0.3
 # accuracy
 accuracy_numerator = 0
 number_tweet = 0
@@ -172,6 +172,7 @@ if whichGram == 3:
 
 # Evaluate Test tweets
 for i in Vocabulary.read(test_tweet, vocabulary):
+    dummy_message = i.message
     tweetId = i.tweetId
     language = i.language
     test = gram.gram(i.message, whichGram)
@@ -200,6 +201,12 @@ for i in Vocabulary.read(test_tweet, vocabulary):
                         (languages[lang]["list"].get(i, smooth_value)) / firstCharCount, 10)
                 except:
                     pass
+                if vocabulary == 3:
+                    diff_lang = ['Ç', 'ü', 'é', 'â', 'ä', 'à', 'ç', 'ê', 'ë', 'è', 'ï', 'î', 'ì', 'Ä', 'Å', 'É', 'ô', 'ö',
+                                 'ò', 'û', 'ù', 'ÿ', 'Ö', 'Ü', 'á', 'í', 'ó', 'ú', 'ñ', 'Ñ']
+                    if 1 in [c in dummy_message for c in diff_lang]:
+                        languages["en"]["score"] = -100000
+                        languages["eu"]["score"] = -100000
 
     if whichGram == 3:
         # Tri-gram P(ABC) = P(AB) * P(BC) / P(B*), B* = all tri-grams starting with B

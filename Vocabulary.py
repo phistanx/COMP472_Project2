@@ -51,4 +51,14 @@ def vocabulariesUpdateMessage(vocabulary, message):
                 newMess += message[i]
             else:
                 newMess += "*"
+    elif vocabulary == 3:
+        temp = message.split(" ")
+        temp = list(filter(lambda x: "@" not in x, temp))
+        message = " ".join(temp)
+        for i in range(len(message)):
+            if (message[i].isalpha()):
+                newMess += message[i]
+            else:
+                newMess += "*"
+#dddd*dsa*dsajka
     return newMess
