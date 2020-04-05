@@ -13,7 +13,10 @@ def writeToEvaluationFile(languages, whichGram, number_tweet, smooth_value, voca
             print("An error in writing to evaluation")
 
     macro_f1 = macro_f1 / 6
-    weight_f1 = weight_f1 / number_tweet
+    try:
+        weight_f1 = weight_f1 / number_tweet
+    except:
+        pass
 
     eval_file_name = "eval_" + str(vocabulary) + "_" + str(whichGram) + "_" + str(smooth_value) + ".txt"
 
